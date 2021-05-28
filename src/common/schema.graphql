@@ -13,11 +13,15 @@ type Mutation {
   # https://github.com/graphql/graphql-spec/issues/488
   queueDamSong(input: QueueDamSongInput): Int!
   queueYoutubeSong(input: QueueYoutubeSongInput): Int!
+  pushAdhocLyrics(input: PushAdhocLyricsInput): Boolean!
+  popAdhocLyrics: Boolean!
+  clearAdhocLyrics: Boolean!
   popSong: QueueItem
   removeSong(songId: String!, timestamp: String!): Boolean!
 }
 
 type Subscription {
+  currentSongAdhocLyricsChanged: [String!]!
   queueChanged: [QueueItem!]!
   queueAdded: QueueItem!
 }
@@ -102,6 +106,7 @@ input QueueYoutubeSongInput {
   name: String!
   artistName: String!
   playtime: Int
+  adhocSongLyrics: String
 }
 
 type SongConnection {
@@ -123,6 +128,10 @@ type SongPageInfo {
 
 type StreamingUrlInfo {
   url: String!
+}
+
+input PushAdhocLyricsInput {
+  lyric: String!
 }
 
 interface QueueItemInterface {

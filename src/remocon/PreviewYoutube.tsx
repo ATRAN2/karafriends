@@ -40,6 +40,7 @@ function PreviewYoutube(props: PreviewYoutubeProps) {
     typeof YoutubePlayer
   > | null> = useRef(null);
   const { videoId } = props;
+  const [adhocSongLyrics, setAdhocSongLyrics] = useState<string | null>(null);
   const videoData = useLazyLoadQuery<PreviewYoutubeVideoInfoQuery>(
     previewYoutubeVideoInfoQuery,
     { videoId }
@@ -53,6 +54,13 @@ function PreviewYoutube(props: PreviewYoutubeProps) {
       playerRef.current.stopVideo();
     }
   }, [props.videoId]);
+
+  function onAdhocSongLyricsChanged(
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) {
+    const input = event.target.value;
+    setAdhocSongLyrics(input && input.trim() !== "" ? input : null);
+  }
 
   function displayVideoInfo(videoInfo: PreviewYoutubeVideoInfoQueryResponse) {
     switch (videoData.youtubeVideoInfo.__typename) {
@@ -78,10 +86,18 @@ function PreviewYoutube(props: PreviewYoutubeProps) {
                     name: videoData.youtubeVideoInfo.title,
                     artistName: videoData.youtubeVideoInfo.author,
                     playtime: videoData.youtubeVideoInfo.lengthSeconds,
+                    adhocSongLyrics: adhocSongLyrics,
                   },
                 }}
               />
             </div>
+            <textarea
+              className="flex-item"
+              onChange={onAdhocSongLyricsChanged}
+              placeholder={
+                "Paste adhoc song lyrics here. Lyrics can be added line by line onto the screen while the song is playing"
+              }
+            />
           </div>
         );
       case "YoutubeVideoInfoError":

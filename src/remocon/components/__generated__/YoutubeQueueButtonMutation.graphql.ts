@@ -8,6 +8,7 @@ export type QueueYoutubeSongInput = {
     name: string;
     artistName: string;
     playtime?: number | null;
+    adhocSongLyrics?: string | null;
 };
 export type YoutubeQueueButtonMutationVariables = {
     input: QueueYoutubeSongInput;
