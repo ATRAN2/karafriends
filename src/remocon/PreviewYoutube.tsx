@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { graphql, QueryRenderer, useLazyLoadQuery } from "react-relay";
+import { graphql, requestSubscription, useLazyLoadQuery } from "react-relay";
 import YoutubePlayer from "youtube-player";
 import { withLoader } from "../common/components/Loader";
 import YoutubeQueueButton from "./components/YoutubeQueueButton";
@@ -9,6 +9,9 @@ import {
 } from "./__generated__/PreviewYoutubeVideoInfoQuery.graphql";
 
 import "./PreviewYoutube.css";
+
+import environment from "../common/graphqlEnvironment";
+import { PreviewYoutubeCurrentSongAdhocLyricsChangedSubscription } from "./__generated__/PreviewYoutubeCurrentSongAdhocLyricsChangedSubscription.graphql";
 
 const previewYoutubeVideoInfoQuery = graphql`
   query PreviewYoutubeVideoInfoQuery($videoId: String!) {
@@ -31,6 +34,12 @@ const previewYoutubeVideoInfoQuery = graphql`
   }
 `;
 
+const previewYoutubeCurrentSongAdhocLyricsChangedSubscription = graphql`
+  subscription PreviewYoutubeCurrentSongAdhocLyricsChangedSubscription {
+    currentSongAdhocLyricsChanged
+  }
+`;
+
 type PreviewYoutubeProps = {
   videoId: string;
 };
@@ -45,6 +54,24 @@ function PreviewYoutube(props: PreviewYoutubeProps) {
     previewYoutubeVideoInfoQuery,
     { videoId }
   );
+
+  const [lyrics, setLyrics] = useState<string[]>([]);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const subscription = requestSubscription<PreviewYoutubeCurrentSongAdhocLyricsChangedSubscription>(
+      environment,
+      {
+        subscription: previewYoutubeCurrentSongAdhocLyricsChangedSubscription,
+        variables: {},
+        onNext: (response) => {
+          if (response?.currentSongAdhocLyricsChanged) {
+            setLyrics([...response.currentSongAdhocLyricsChanged]);
+          }
+        },
+      }
+    );
+  }, []);
 
   useEffect(() => {
     if (playerRef.current == null) {
@@ -86,7 +113,7 @@ function PreviewYoutube(props: PreviewYoutubeProps) {
                     name: videoData.youtubeVideoInfo.title,
                     artistName: videoData.youtubeVideoInfo.author,
                     playtime: videoData.youtubeVideoInfo.lengthSeconds,
-                    adhocSongLyrics: adhocSongLyrics,
+                    adhocSongLyrics,
                   },
                 }}
               />
@@ -98,6 +125,7 @@ function PreviewYoutube(props: PreviewYoutubeProps) {
                 "Paste adhoc song lyrics here. Lyrics can be added line by line onto the screen while the song is playing"
               }
             />
+            <video src="vids/u0CqY27IFyo.mp4" ref={videoRef} />
           </div>
         );
       case "YoutubeVideoInfoError":

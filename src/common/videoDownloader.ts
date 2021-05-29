@@ -1,3 +1,4 @@
+import { app } from 'electron';
 import fs from "fs";
 import ytdl from "ytdl-core";
 
@@ -5,7 +6,11 @@ export function downloadYoutubeVideo(
   videoId: string,
   onComplete: () => any
 ): void {
-  const writePath = `vids/${videoId}.mp4`;
+  const tempFolder: string = app.getPath('temp')
+  if (!fs.existsSync(tempFolder)) {
+    fs.mkdirSync(tempFolder)
+  }
+  const writePath = `${tempFolder}/${videoId}.mp4`;
   if (fs.existsSync(writePath)) {
     onComplete();
     return;
