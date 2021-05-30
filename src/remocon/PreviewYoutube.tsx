@@ -11,6 +11,7 @@ import {
 import "./PreviewYoutube.css";
 
 import environment from "../common/graphqlEnvironment";
+import AdhocLyrics from "./../renderer/AdHocLyrics";
 import { PreviewYoutubeCurrentSongAdhocLyricsChangedSubscription } from "./__generated__/PreviewYoutubeCurrentSongAdhocLyricsChangedSubscription.graphql";
 
 const previewYoutubeVideoInfoQuery = graphql`
@@ -71,6 +72,8 @@ function PreviewYoutube(props: PreviewYoutubeProps) {
         },
       }
     );
+    // @ts-ignore
+    window.videoRef = videoRef;
   }, []);
 
   useEffect(() => {
@@ -118,14 +121,21 @@ function PreviewYoutube(props: PreviewYoutubeProps) {
                 }}
               />
             </div>
-            <textarea
-              className="flex-item"
-              onChange={onAdhocSongLyricsChanged}
-              placeholder={
-                "Paste adhoc song lyrics here. Lyrics can be added line by line onto the screen while the song is playing"
-              }
-            />
-            <video src="vids/u0CqY27IFyo.mp4" ref={videoRef} />
+            <div className="flex-item">
+              <textarea
+                onChange={onAdhocSongLyricsChanged}
+                placeholder={
+                  "Paste adhoc song lyrics here. Lyrics can be added line by line onto the screen while the song is playing"
+                }
+              />
+            </div>
+            <div className="vid-container">
+              <video src="static/u0CqY27IFyo.mp4" ref={videoRef} controls />
+              <AdhocLyrics
+                videoRef={videoRef}
+                lyrics={["holafewafewa", "gjrioejgiowea"]}
+              />
+            </div>
           </div>
         );
       case "YoutubeVideoInfoError":

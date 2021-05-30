@@ -1,16 +1,17 @@
-import { app } from 'electron';
+import { app } from "electron";
 import fs from "fs";
 import ytdl from "ytdl-core";
+
+export const TEMP_FOLDER: string = `${app.getPath("temp")}/karafriends_tmp`;
 
 export function downloadYoutubeVideo(
   videoId: string,
   onComplete: () => any
 ): void {
-  const tempFolder: string = app.getPath('temp')
-  if (!fs.existsSync(tempFolder)) {
-    fs.mkdirSync(tempFolder)
+  if (!fs.existsSync(TEMP_FOLDER)) {
+    fs.mkdirSync(TEMP_FOLDER);
   }
-  const writePath = `${tempFolder}/${videoId}.mp4`;
+  const writePath = `${TEMP_FOLDER}/${videoId}.mp4`;
   if (fs.existsSync(writePath)) {
     onComplete();
     return;
