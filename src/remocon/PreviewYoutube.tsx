@@ -133,7 +133,7 @@ function PreviewYoutube(props: PreviewYoutubeProps) {
               <video src="static/u0CqY27IFyo.mp4" ref={videoRef} controls />
               <AdhocLyrics
                 videoRef={videoRef}
-                lyrics={["holafewafewa", "gjrioejgiowea"]}
+                lyrics={["か弱い光が指差す先", "Silent haze 霞がちに止まる影"]}
               />
             </div>
           </div>

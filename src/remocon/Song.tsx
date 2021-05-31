@@ -25,10 +25,8 @@ interface SongParams {
   id: string;
 }
 
-interface Props extends RouteComponentProps<SongParams> {}
-
-function Song(props: Props) {
-  const { id } = props.match.params;
+function Song(props: { id: string }) {
+  const { id } = props;
   const data = useLazyLoadQuery<SongQuery>(songQuery, { id });
   const song = data.songById;
   return (
@@ -80,5 +78,14 @@ function Song(props: Props) {
     </div>
   );
 }
+
+interface SongFromRouterProps extends RouteComponentProps<SongParams> {}
+
+function _SongFromRouter(props: SongFromRouterProps) {
+  const { id } = props.match.params;
+  return <Song id={id} />;
+}
+
+export const SongFromRouter = withLoader(_SongFromRouter);
 
 export default withLoader(Song);

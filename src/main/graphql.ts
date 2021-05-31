@@ -12,6 +12,7 @@ import { HOSTNAME } from "../common/constants";
 import rawSchema from "../common/schema.graphql";
 import { DkwebsysAPI, MinseiAPI, MinseiCredentials } from "./damApi";
 import { YoutubeAPI } from "./youtubeApi";
+import Queue from "../renderer/Queue";
 
 interface IDataSources {
   dataSources: {
@@ -124,6 +125,7 @@ type PushAdhocLyricsInput = {
 };
 
 type NotARealDb = {
+  currentSong: QueueItem | null;
   songQueue: QueueItem[];
   currentSongAdhocLyrics: string[];
   idToAdhocLyrics: Record<string, string[]>;
@@ -136,6 +138,7 @@ enum SubscriptionEvent {
 }
 
 const db: NotARealDb = {
+  currentSong: null,
   currentSongAdhocLyrics: [],
   idToAdhocLyrics: {},
   songQueue: [],
@@ -255,6 +258,11 @@ const resolvers = {
       return dataSources.minsei
         .getScoringData(parent.id)
         .then((data) => Array.from(new Uint8Array(data)));
+    },
+  },
+  YoutubeQueueItem: {
+    adhocSongLyrics(parent: YoutubeQueueItem) {
+      return db.idToAdhocLyrics[parent.id] || null;
     },
   },
   Query: {
@@ -422,6 +430,9 @@ const resolvers = {
         };
       });
     },
+    currentSong: (): QueueItem | null => {
+      return db.currentSong;
+    },
   },
   Mutation: {
     queueDamSong: (_: any, args: { input: QueueDamSongInput }): number => {
@@ -450,12 +461,7 @@ const resolvers = {
         args.input.id,
         pushSongToQueue.bind(null, queueItem)
       );
-      // The song hasn't actually been added to the queue yet, but let's
-      // optimistically return the eta assuming it will successfully queue
-      return (
-        db.songQueue.reduce((acc, cur) => acc + (cur.playtime || 0), 0) +
-        (args.input.playtime || 0)
-      );
+      return db.songQueue.reduce((acc, cur) => acc + (cur.playtime || 0), 0);
     },
     pushAdhocLyrics: (
       _: any,
@@ -485,7 +491,10 @@ const resolvers = {
       pubsub.publish(SubscriptionEvent.QueueChanged, {
         queueChanged: db.songQueue,
       });
-      return db.songQueue.shift() || null;
+      const newSong = db.songQueue.shift() || null;
+      console.log(newSong);
+      db.currentSong = newSong || null;
+      return newSong;
     },
     removeSong: (
       _: any,

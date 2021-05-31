@@ -12,19 +12,33 @@ export default function AdhocLyrics(props: {
     displayLyrics(canvasRef.current, props.lyrics);
   }, [props.lyrics]);
 
+  useEffect(() => {
+    if (!props.videoRef.current) return;
+    props.videoRef.current.addEventListener("resize", () => {
+      if (!canvasRef.current) return;
+      if (!props.videoRef.current) return;
+      canvasRef.current.width =
+        props.videoRef.current.getBoundingClientRect().width *
+        window.devicePixelRatio;
+      canvasRef.current.height =
+        props.videoRef.current.getBoundingClientRect().height *
+        window.devicePixelRatio *
+        0.9;
+      displayLyrics(canvasRef.current, props.lyrics);
+    });
+  }, [props.videoRef.current]);
+
   function displayLyrics(canvas: HTMLCanvasElement, lyrics: string[]): void {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    canvas.width = canvas.clientWidth * window.devicePixelRatio;
-    canvas.height = canvas.clientHeight * window.devicePixelRatio;
-
-    const fontSize = canvas.height / 10;
+    const fontSize = Math.round(canvas.height / 10);
     ctx.font = `bold ${fontSize}px 'Aria', sans-serif`;
     ctx.fillStyle = "white";
     ctx.strokeStyle = "black";
-    ctx.lineWidth = 4;
-    let verticalSpace = canvas.height - fontSize;
+    ctx.lineWidth = 2;
+    let verticalSpace = canvas.height - fontSize / 2;
+    console.log("hoa");
 
     lyrics
       .slice()

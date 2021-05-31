@@ -7,9 +7,10 @@ import "materialize-css/dist/css/materialize.css"; // tslint:disable-line:no-sub
 
 import Artist from "./Artist";
 import Controls from "./Controls";
+import CurrentSong from "./CurrentSong";
 import History from "./History";
 import Search from "./Search";
-import Song from "./Song";
+import { SongFromRouter } from "./Song";
 
 function App() {
   useEffect(() => {
@@ -35,6 +36,9 @@ function App() {
               <li>
                 <Link to="/controls">Controls</Link>
               </li>
+              <li>
+                <Link to="/currentSong">Current Song</Link>
+              </li>
             </ul>
           </div>
         </nav>
@@ -48,14 +52,18 @@ function App() {
           <li>
             <Link to="/">Controls</Link>
           </li>
+          <li>
+            <Link to="/currentSong">Current Song</Link>
+          </li>
         </ul>
 
         <div className="container">
           <Switch>
             <Route path="/artist/:id" component={Artist} />
-            <Route path="/song/:id" component={Song} />
+            <Route path="/song/:id" component={SongFromRouter} />
             <Route path="/search" component={Search} />
             <Route path="/history" component={History} />
+            <Route path="/currentSong" component={CurrentSong} />
             <Route path="/">
               <Controls />
             </Route>

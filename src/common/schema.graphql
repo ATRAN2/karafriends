@@ -6,6 +6,7 @@ type Query {
   queue: [QueueItem!]!
   history(first: Int, after: String): HistoryConnection!
   youtubeVideoInfo(videoId: String): YoutubeVideoInfoResult!
+  currentSong: QueueItem
 }
 
 type Mutation {
@@ -159,6 +160,7 @@ type YoutubeQueueItem implements QueueItemInterface {
   artistName: String!
   playtime: Int
   timestamp: String!
+  adhocSongLyrics: [String!]
 }
 
 union QueueItem = DamQueueItem | YoutubeQueueItem
